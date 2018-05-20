@@ -9,23 +9,78 @@ from qutip import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-
-
-#sigmap = sigmax() + sigmay()*1j
-#sigmam = sigmax() - sigmay()*1j
 I = qeye(2)
-times = np.linspace(0.0, 81.0, 1000.0)
+times = np.linspace(0.0, 100.0, 1000.0)
 C3=1
 
-psi1 = tensor(fock(2,1),fock(2,0),fock(2,0))
-psi1 = psi1*psi1.dag()
+
+qubits = [[0,0],[1,0],[2,0]]
+
+def makematrix(qubits_co):
+    intmatrix = []
+    for i in range(len(qubits_co)):
+        temprow = []
+        for j in range(len(qubits_co)):
+            temprow.append(((qubits_co[i][0]-qubits_co[j][0])**2+(qubits_co[i][1]-qubits_co[j][1])**2)**1.5)
+        intmatrix.append(temprow)
+    return intmatrix
+        
+def makeinputoutput(atom_number):
+    tempstatein = fock(2,1)
+    for i in range(atom_number-1):
+        tempstatein = tensor(tempstatein,fock(2,0))
+    tempstateout = tempstatein*tempstatein.dag()
+    return tempstatein, tempstateout
+
+def makesig(i,j,atoms):
+    temp1 = [I]*atoms
+    temp2 = [I]*atoms
+    temp1[i] = sigmap()
+    temp1[j] = sigmam()
+    temp2[i] = sigmam()
+    temp2[j] = sigmap()
+    temp = tensor(temp1)+tensor(temp2)
+    return temp
+    
+
+def makeham(intmatrix):
+    atoms = len(intmatrix)
+    components =  []
+    for i in range(atoms):
+        for j in range(atoms):
+            if j < i:
+                components.append(1/intmatrix[i][j]*makesig(i,j,atoms))
+    ham = 0.5*C3*sum(components)
+    return ham
 
 
-H = 1/2*(C3/(1)*(tensor(sigmap(),sigmam(),I)+tensor(sigmam(),sigmap(),I))+C3/(1)*(tensor(I,sigmap(),sigmam())+tensor(I,sigmam(),sigmap()))+C3/(8)*(tensor(sigmap(),I,sigmam())+tensor(sigmam(),I,sigmap())))
+def makeplot(H,timesteps,instate,basis):
+    data = mcsolve(H,instate,timesteps,[],basis)
+    plt.plot(timesteps, data.expect[0])
 
-psi0 = tensor(fock(2,1),fock(2,0),fock(2,0))
+def doall(qubits,times):
+    int_matrix = makematrix(qubits)
+    input_state, output_basis = makeinputoutput(len(qubits))
+    H = makeham(int_matrix)
+    makeplot(H,times,input_state,output_basis)
 
-data = mcsolve(H,psi0,times,[],[psi1])
 
-plt.plot(times, data.expect[0])
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
