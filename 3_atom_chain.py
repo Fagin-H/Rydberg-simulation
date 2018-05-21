@@ -9,11 +9,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 I = qeye(2)
-times = np.linspace(0.0, 100.0, 1000.0)
+times = np.linspace(0.0, 1.0, 1000.0)
 C3=1
 
 
-qubits = [[0,0],[1,0],[2,0]]
+qubits = [[ -0.02059458,  -0.09878526],[  0.11381193,  11.54565914],[  0.02234086,  12.2043137 ],[ -0.17415859,  12.92271772]]
 
 def makematrix(qubits_co):
     intmatrix = []
