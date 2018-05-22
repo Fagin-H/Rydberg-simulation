@@ -7,6 +7,7 @@ Created on Fri May 18 16:57:21 2018
 from qutip import *
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.random import randn
 
 I = qeye(2)
 times = np.linspace(0.0, 7.0, 1000.0)
@@ -20,6 +21,13 @@ qubits = np.array([[0,0,0],[20,0,0],[40,0,0]])
 def makematrix(qubits_co):
     intmatrix = [[np.linalg.norm(qubits_co[i]-qubits_co[j])**3 for j in range(len(qubits_co))] for i in range(len(qubits_co))]
     return intmatrix
+
+def makehamcoeff(qubits,q1,q2,r_rms,v_rms):
+    q1pos = qubits[q1] + 3**-0.5*r_rms*randn(3)
+    q2pos = qubits[q2] + 3**-0.5*r_rms*randn(3)
+    def H_coeff(t,args):
+        return (q1pos + 3**-0.5*v_rms*randn(3) - q2pos - 3**-0.5*v_rms*randn(3))**-3
+    return H_coeff
 
 def makeinputoutput(atom_number):
     tempstatein = fock(2,1)
