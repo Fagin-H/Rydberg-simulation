@@ -26,7 +26,7 @@ def makehamcoeff(qubits,q1,q2,r_rms,v_rms):
     q1pos = qubits[q1] + 3**-0.5*r_rms*randn(3)
     q2pos = qubits[q2] + 3**-0.5*r_rms*randn(3)
     def H_coeff(t,args):
-        return (q1pos + 3**-0.5*v_rms*randn(3) - q2pos - 3**-0.5*v_rms*randn(3))**-3
+        return (q1pos + 3**-0.5*v_rms*randn(3)*t - q2pos - 3**-0.5*v_rms*randn(3)*t)**-3
     return H_coeff
 
 def makeinputoutput(atom_number):
@@ -55,6 +55,11 @@ def makeham(intmatrix):
                 components.append(1/intmatrix[i][j]*makesig(i,j,atoms))
     ham = 0.5*C3*sum(components)
     return ham
+
+def makehamt(qubits,r_rms,v_rms):
+    return [0] + [[makesig(i,j,len(qubits)),makehamcoeff(qubits,i,j,r_rms,v_rms)] 
+                   for i in range(len(qubits)) for j in range(len(qubits)) if j<i]
+    
 
 def makeplot(H,timesteps,instate,basis):
     data = mcsolve(H,instate,timesteps,[],basis)
