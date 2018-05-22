@@ -9,21 +9,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 I = qeye(2)
-times = np.linspace(0.0, 1.0, 1000.0)
-C3=1
+times = np.linspace(0.0, 7.0, 1000.0)
+C3 = 7965
 
+sigmap = sigmax() + sigmay()*1j
+sigmam = sigmax() - sigmay()*1j
 
-qubits = [[ -0.02059458,  -0.09878526],[  0.11381193,  11.54565914],[  0.02234086,  12.2043137 ],[ -0.17415859,  12.92271772]]
+qubits = np.array([[0,0],[20,0],[40,0]])
 
 def makematrix(qubits_co):
-    intmatrix = []
-    for i in range(len(qubits_co)):
-        temprow = []
-        for j in range(len(qubits_co)):
-            temprow.append(((qubits_co[i][0]-qubits_co[j][0])**2+(qubits_co[i][1]-qubits_co[j][1])**2)**1.5)
-        intmatrix.append(temprow)
+    intmatrix = [[np.linalg.norm(qubits_co[i]-qubits_co[j])**3 for j in range(len(qubits_co))] for i in range(len(qubits_co))]
     return intmatrix
-        
+
 def makeinputoutput(atom_number):
     tempstatein = fock(2,1)
     for i in range(atom_number-1):
@@ -34,13 +31,12 @@ def makeinputoutput(atom_number):
 def makesig(i,j,atoms):
     temp1 = [I]*atoms
     temp2 = [I]*atoms
-    temp1[i] = sigmap()
-    temp1[j] = sigmam()
-    temp2[i] = sigmam()
-    temp2[j] = sigmap()
+    temp1[i] = sigmap
+    temp1[j] = sigmam
+    temp2[i] = sigmam
+    temp2[j] = sigmap
     temp = tensor(temp1)+tensor(temp2)
     return temp
-    
 
 def makeham(intmatrix):
     atoms = len(intmatrix)
@@ -51,7 +47,6 @@ def makeham(intmatrix):
                 components.append(1/intmatrix[i][j]*makesig(i,j,atoms))
     ham = 0.5*C3*sum(components)
     return ham
-
 
 def makeplot(H,timesteps,instate,basis):
     data = mcsolve(H,instate,timesteps,[],basis)

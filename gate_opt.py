@@ -47,7 +47,7 @@ def makeham(intmatrix):
         for j in range(atoms):
             if j < i:
                 components.append(1/intmatrix[i][j]*makesig(i,j,atoms))
-    ham = 0.5*C3*sum(components)
+    ham = C3*sum(components)
     return ham
 
 
