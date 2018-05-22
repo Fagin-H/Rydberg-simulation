@@ -15,7 +15,7 @@ C3 = 7965
 sigmap = sigmax() + sigmay()*1j
 sigmam = sigmax() - sigmay()*1j
 
-qubits = np.array([[0,0],[20,0],[40,0]])
+qubits = np.array([[0,0,0],[20,0,0],[40,0,0]])
 
 def makematrix(qubits_co):
     intmatrix = [[np.linalg.norm(qubits_co[i]-qubits_co[j])**3 for j in range(len(qubits_co))] for i in range(len(qubits_co))]
