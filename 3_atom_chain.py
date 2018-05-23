@@ -26,7 +26,7 @@ def makehamcoeff(qubits,q1,q2,r_rms,v_rms):
     q1pos = qubits[q1] + 3**-0.5*r_rms*randn(3)
     q2pos = qubits[q2] + 3**-0.5*r_rms*randn(3)
     def H_coeff(t,args):
-        return C3*np.linalg.norm(q1pos + 3**-0.5*v_rms*randn(3)*t - q2pos - 3**-0.5*v_rms*randn(3)*t)**-3
+        return 0.5*C3*np.linalg.norm(q1pos + 3**-0.5*v_rms*randn(3)*t - q2pos - 3**-0.5*v_rms*randn(3)*t)**-3
     return H_coeff
 
 def makeinputoutput(atom_number):
