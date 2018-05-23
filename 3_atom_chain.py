@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy.random import randn
 
-I = qeye(2)
+I = qeye(3)
 times = np.linspace(0.0, 7.0, 1000.0)
 C3 = 7965
 kB = 1.38e-23
@@ -17,8 +17,16 @@ m = 1.42e-25
 omega = 0.09
 Temp = 5e-5
 
-sigmap = sigmax() + sigmay()*1j
-sigmam = sigmax() - sigmay()*1j
+sx = Qobj([[0,1,0],
+           [1,0,0],
+           [0,0,0]])
+
+sy = Qobj([[0,-1j,0],
+           [1j,0,0],
+           [0,0,0]])
+
+sigmap = sx + sy*1j
+sigmam = sx - sy*1j
 
 qubits = np.array([[0,0,0],[20,0,0],[40,0,0]])
 
@@ -36,9 +44,9 @@ def makehamcoeff(qubits,q1,q2,T):
     return H_coeff
 
 def makeinputoutput(atom_number):
-    tempstatein = fock(2,1)
+    tempstatein = fock(3,1)
     for i in range(atom_number-1):
-        tempstatein = tensor(tempstatein,fock(2,0))
+        tempstatein = tensor(tempstatein,fock(3,0))
     tempstateout = tempstatein*tempstatein.dag()
     return tempstatein, tempstateout
 
