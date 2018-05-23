@@ -17,6 +17,10 @@ m = 1.42e-25
 omega = 0.09
 Temp = 5e-5
 
+gamma = 1
+gammaup = 1/101
+gammadown = 1/135
+
 sx = Qobj([[0,1,0],
            [1,0,0],
            [0,0,0]])
@@ -60,6 +64,15 @@ def makesig(i,j,atoms):
     temp = tensor(temp1)+tensor(temp2)
     return temp
 
+def makecollapse(i,qubits):
+    c_ops = []
+    temp = [I]*len(qubits)
+    temp[i] = (gamma+gammaup)**0.5*fock(3,2)*fock(3,1).dag()
+    c_ops.append(temp)
+    temp[i] = gammadown**0.5*fock(3,20)*fock(3,0).dag()
+    c_ops.append(temp)
+    return c_ops
+
 def makeham(intmatrix):
     atoms = len(intmatrix)
     components =  []
@@ -75,17 +88,23 @@ def makehamt(qubits,T):
                    for i in range(len(qubits)) for j in range(len(qubits)) if j<i]
     
 
-def makeplot(H,timesteps,instate,basis):
-    data = mcsolve(H,instate,timesteps,[],basis)
+def makeplot(H,timesteps,instate,basis,collapse):
+    c_ops = []
+    if collapse == True:
+        for i in range(len(qubits)):
+            c_ops += makecollapse(i)
+    else:
+        pass
+    data = mcsolve(H,instate,timesteps,c_ops,basis)
     plt.plot(timesteps, data.expect[0])
 
-def doall(qubits,times):
+def doall(qubits,times,collapse):
     int_matrix = makematrix(qubits)
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makeham(int_matrix)
-    makeplot(H,times,input_state,output_basis)
+    makeplot(H,times,input_state,output_basis,collapse)
     
-def doallt(qubits,times,T):
+def doallt(qubits,times,T,collapse):
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makehamt(qubits,T)
-    makeplot(H,times,input_state,output_basis)
+    makeplot(H,times,input_state,output_basis,collapse)
