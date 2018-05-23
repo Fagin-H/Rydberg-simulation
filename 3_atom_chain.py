@@ -34,6 +34,8 @@ sigmam = sx - sy*1j
 
 qubits = np.array([[0,0,0],[20,0,0],[40,0,0]])
 
+opts = Odeoptions(nsteps=20000)
+
 def makematrix(qubits_co):
     intmatrix = [[np.linalg.norm(qubits_co[i]-qubits_co[j])**3 for j in range(len(qubits_co))] for i in range(len(qubits_co))]
     return intmatrix
@@ -69,7 +71,7 @@ def makecollapse(i,qubits):
     temp = [I]*len(qubits)
     temp[i] = (gamma+gammaup)**0.5*fock(3,2)*fock(3,1).dag()
     c_ops.append(temp)
-    temp[i] = gammadown**0.5*fock(3,20)*fock(3,0).dag()
+    temp[i] = gammadown**0.5*fock(3,2)*fock(3,0).dag()
     c_ops.append(temp)
     return c_ops
 
@@ -95,7 +97,7 @@ def makeplot(H,timesteps,instate,basis,collapse=None):
             c_ops += makecollapse(i)
     else:
         pass
-    data = mcsolve(H,instate,timesteps,c_ops,basis)
+    data = mcsolve(H,instate,timesteps,c_ops,basis,options=opts)
     plt.plot(timesteps, data.expect[0])
 
 def doall(qubits,times,collapse=None):
