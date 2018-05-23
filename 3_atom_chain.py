@@ -12,6 +12,10 @@ from numpy.random import randn
 I = qeye(2)
 times = np.linspace(0.0, 7.0, 1000.0)
 C3 = 7965
+kB = 1.38e-23
+m = 1.42e-25
+omega = 0.09
+Temp = 5e-5
 
 sigmap = sigmax() + sigmay()*1j
 sigmam = sigmax() - sigmay()*1j
@@ -22,7 +26,9 @@ def makematrix(qubits_co):
     intmatrix = [[np.linalg.norm(qubits_co[i]-qubits_co[j])**3 for j in range(len(qubits_co))] for i in range(len(qubits_co))]
     return intmatrix
 
-def makehamcoeff(qubits,q1,q2,r_rms,v_rms):
+def makehamcoeff(qubits,q1,q2,T):
+    r_rms = (T*kB/(m*omega**2))**0.5
+    v_rms = (T*kB/(m))**0.5
     q1pos = qubits[q1] + 3**-0.5*r_rms*randn(3)
     q2pos = qubits[q2] + 3**-0.5*r_rms*randn(3)
     def H_coeff(t,args):
@@ -56,8 +62,8 @@ def makeham(intmatrix):
     ham = 0.5*C3*sum(components)
     return ham
 
-def makehamt(qubits,r_rms,v_rms):
-    return [tensor([0*I]*len(qubits))] + [[makesig(i,j,len(qubits)),makehamcoeff(qubits,i,j,r_rms,v_rms)] 
+def makehamt(qubits,T):
+    return [tensor([0*I]*len(qubits))] + [[makesig(i,j,len(qubits)),makehamcoeff(qubits,i,j,T)] 
                    for i in range(len(qubits)) for j in range(len(qubits)) if j<i]
     
 
@@ -71,7 +77,7 @@ def doall(qubits,times):
     H = makeham(int_matrix)
     makeplot(H,times,input_state,output_basis)
     
-def doallt(qubits,times,r_rms,v_rms):
+def doallt(qubits,times,T):
     input_state, output_basis = makeinputoutput(len(qubits))
-    H = makehamt(qubits,r_rms,v_rms)
+    H = makehamt(qubits,T)
     makeplot(H,times,input_state,output_basis)
