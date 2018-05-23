@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from numpy.random import randn
 
 I = qeye(3)
-times = np.linspace(0.0, 7.0, 1000.0)
+times = np.linspace(0.0, 21, 1000.0)
 C3 = 7965
 kB = 1.38e-23
 m = 1.42e-25
@@ -34,7 +34,7 @@ sigmam = sx - sy*1j
 
 qubits = np.array([[0,0,0],[20,0,0],[40,0,0]])
 
-opts = Odeoptions(nsteps=20000)
+opts = Odeoptions(nsteps=500000)
 
 def makematrix(qubits_co):
     intmatrix = [[np.linalg.norm(qubits_co[i]-qubits_co[j])**3 for j in range(len(qubits_co))] for i in range(len(qubits_co))]
@@ -70,9 +70,11 @@ def makecollapse(i,qubits):
     c_ops = []
     temp = [I]*len(qubits)
     temp[i] = (gamma+gammaup)**0.5*fock(3,2)*fock(3,1).dag()
-    c_ops.append(temp)
+    tens1 = tensor(temp)
+    c_ops.append(tens1)
     temp[i] = gammadown**0.5*fock(3,2)*fock(3,0).dag()
-    c_ops.append(temp)
+    tens2 = tensor(temp)
+    c_ops.append(tens2)
     return c_ops
 
 def makeham(intmatrix):
@@ -90,23 +92,23 @@ def makehamt(qubits,T):
                    for i in range(len(qubits)) for j in range(len(qubits)) if j<i]
     
 
-def makeplot(H,timesteps,instate,basis,collapse=None):
+def makeplot(H,timesteps,instate,basis,qubits,collapse=None):
     c_ops = []
     if collapse == True:
         for i in range(len(qubits)):
-            c_ops += makecollapse(i)
+            c_ops += makecollapse(i,qubits)
     else:
         pass
-    data = mcsolve(H,instate,timesteps,c_ops,basis,options=opts)
+    data = mesolve(H,instate,timesteps,c_ops,basis,options=opts)
     plt.plot(timesteps, data.expect[0])
 
 def doall(qubits,times,collapse=None):
     int_matrix = makematrix(qubits)
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makeham(int_matrix)
-    makeplot(H,times,input_state,output_basis,collapse)
+    makeplot(H,times,input_state,output_basis,qubits,collapse)
     
 def doallt(qubits,times,T,collapse=None):
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makehamt(qubits,T)
-    makeplot(H,times,input_state,output_basis,collapse)
+    makeplot(H,times,input_state,output_basis,qubits,collapse)
