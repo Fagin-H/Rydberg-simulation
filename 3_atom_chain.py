@@ -26,7 +26,7 @@ def makehamcoeff(qubits,q1,q2,r_rms,v_rms):
     q1pos = qubits[q1] + 3**-0.5*r_rms*randn(3)
     q2pos = qubits[q2] + 3**-0.5*r_rms*randn(3)
     def H_coeff(t,args):
-        return C3*(q1pos + 3**-0.5*v_rms*randn(3)*t - q2pos - 3**-0.5*v_rms*randn(3)*t)**-3
+        return C3*np.linalg.norm(q1pos + 3**-0.5*v_rms*randn(3)*t - q2pos - 3**-0.5*v_rms*randn(3)*t)**-3
     return H_coeff
 
 def makeinputoutput(atom_number):
@@ -57,7 +57,7 @@ def makeham(intmatrix):
     return ham
 
 def makehamt(qubits,r_rms,v_rms):
-    return [0] + [[makesig(i,j,len(qubits)),makehamcoeff(qubits,i,j,r_rms,v_rms)] 
+    return [tensor([0*I]*len(qubits))] + [[makesig(i,j,len(qubits)),makehamcoeff(qubits,i,j,r_rms,v_rms)] 
                    for i in range(len(qubits)) for j in range(len(qubits)) if j<i]
     
 
@@ -69,4 +69,9 @@ def doall(qubits,times):
     int_matrix = makematrix(qubits)
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makeham(int_matrix)
+    makeplot(H,times,input_state,output_basis)
+    
+def doallt(qubits,times,r_rms,v_rms):
+    input_state, output_basis = makeinputoutput(len(qubits))
+    H = makehamt(qubits,r_rms,v_rms)
     makeplot(H,times,input_state,output_basis)
