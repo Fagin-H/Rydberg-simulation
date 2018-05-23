@@ -88,7 +88,7 @@ def makehamt(qubits,T):
                    for i in range(len(qubits)) for j in range(len(qubits)) if j<i]
     
 
-def makeplot(H,timesteps,instate,basis,collapse):
+def makeplot(H,timesteps,instate,basis,collapse=None):
     c_ops = []
     if collapse == True:
         for i in range(len(qubits)):
@@ -98,13 +98,13 @@ def makeplot(H,timesteps,instate,basis,collapse):
     data = mcsolve(H,instate,timesteps,c_ops,basis)
     plt.plot(timesteps, data.expect[0])
 
-def doall(qubits,times,collapse):
+def doall(qubits,times,collapse=None):
     int_matrix = makematrix(qubits)
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makeham(int_matrix)
     makeplot(H,times,input_state,output_basis,collapse)
     
-def doallt(qubits,times,T,collapse):
+def doallt(qubits,times,T,collapse=None):
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makehamt(qubits,T)
     makeplot(H,times,input_state,output_basis,collapse)
