@@ -8,16 +8,17 @@ from qutip import *
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.random import randn
+import time
 
 I = qeye(3)
 times = np.linspace(0.0, 21, 1000.0)
 C3 = 7965
 kB = 1.38e-23
 m = 1.42e-25
-omega = 0.09
+omega = 0.09/(2*np.pi)
 Temp = 5e-5
 
-gamma = 1
+gamma = 0
 gammaup = 1/101
 gammadown = 1/135
 
@@ -34,7 +35,7 @@ sigmam = sx - sy*1j
 
 qubits = np.array([[0,0,0],[20,0,0],[40,0,0]])
 
-opts = Odeoptions(nsteps=500000)
+opts = Odeoptions(nsteps=100000)
 
 def makematrix(qubits_co):
     intmatrix = [[np.linalg.norm(qubits_co[i]-qubits_co[j])**3 for j in range(len(qubits_co))] for i in range(len(qubits_co))]
@@ -103,12 +104,22 @@ def makeplot(H,timesteps,instate,basis,qubits,collapse=None):
     plt.plot(timesteps, data.expect[0])
 
 def doall(qubits,times,collapse=None):
+    t1 = time.time()
     int_matrix = makematrix(qubits)
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makeham(int_matrix)
+    #t2 = time.time()
+    #print("Time1: " + str((t2-t1)/60))
     makeplot(H,times,input_state,output_basis,qubits,collapse)
+    t3 = time.time()
+    print("Time: " + str((t3-t1)/60))
     
 def doallt(qubits,times,T,collapse=None):
+    t1 = time.time()
     input_state, output_basis = makeinputoutput(len(qubits))
     H = makehamt(qubits,T)
+    #t2 = time.time()
+    #print("Time1: " + str((t2-t1)/60))
     makeplot(H,times,input_state,output_basis,qubits,collapse)
+    t3 = time.time()
+    print("Time: " + str((t3-t1)/60))
